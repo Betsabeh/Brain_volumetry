@@ -1,4 +1,4 @@
-function [svm_data_w,svm_data_g,svm_data_c]=read_skull_strip_data(s_num,row,col,n_row,n_col)
+function [svm_data_w,svm_data_g,svm_data_c]=read_skull_strip_data2(s_num,row,col,n_row,n_col)
     images = mireadimages ('C:\betsabeh\my_project\volumetry\matlab\data\phantom\nromal\1mm\t1_icbm_normal_1mm_pn0_rf0.mnc',s_num);
     a = reshape (images, row, col);
     [bin,a1,TP,FN,FP,TN,OM,ACC]=skull_strip21(a,s_num);
@@ -38,15 +38,21 @@ K=1;
 l=(K-1)*n_row*n_col+1;
 u=K*n_row*n_col;
 
-svm_data_w(l:u,1)=reshape(a.^2,n_row*n_col,1);
-svm_data_g(l:u,1)=reshape(a.^2,n_row*n_col,1);
-svm_data_c(l:u,1)=reshape(a.^2,n_row*n_col,1);
+s1=reshape(a,1,n_row*n_col);
+% % % w=watershed(a);
+% % % su=sum(s1);
+% % p1=s1/su;
+% % Y = geocdf(s1,p1);
+ mu=mean(s1);
+ Y = expcdf(s1,mu);
 
-t=otsu(a);
-d=bwdist(t,'euclidean');
-svm_data_w(l:u,2)=reshape(d,n_row*n_col,1);
-svm_data_g(l:u,2)=reshape(d,n_row*n_col,1);
-svm_data_c(l:u,2)=reshape(d,n_row*n_col,1);
+svm_data_w(l:u,1)=reshape(Y,1,n_row*n_col);
+svm_data_g(l:u,1)=reshape(Y,1,n_row*n_col);
+svm_data_c(l:u,1)=reshape(Y,1,n_row*n_col);
+
+svm_data_w(l:u,2)=s1;
+svm_data_g(l:u,2)=s1;
+svm_data_c(l:u,2)=s1;
 
 part_la_w=reshape(part_label_w,n_row*n_col,1);
 part_la_g=reshape(part_label_g,n_row*n_col,1);
